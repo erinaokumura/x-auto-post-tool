@@ -17,7 +17,7 @@ https://qiita.com/ponsuke0531/items/4629626a3e84bcd9398f
 
 ## 3. 必要パッケージのインストール
 ```
-pip install fastapi uvicorn
+pip install -r requirements.txt
 ```
 
 ## 4. サーバーの起動
@@ -33,3 +33,8 @@ uvicorn app.main:app --reload
 ```
 deactivate
 ```
+
+==============================================
+## その他設定
+- CursorとGithubを連携する
+  - https://www.genspark.ai/spark/cursor%E3%81%A8github%E3%81%AE%E9%80%A3%E6%90%BA%E6%89%8B%E9%A0%86/612143bb-739e-417c-90fd-120cd8b76073

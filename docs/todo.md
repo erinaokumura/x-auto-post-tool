@@ -8,10 +8,10 @@
 - [x] ツイート実行API
 
 ## 3. ツイート案生成APIの実装
-- [ ] repository名を受け取る
-- [ ] GitHub APIで最新コミット情報を取得
-- [ ] AIでツイート案を生成(OpenAI API等を使った文章生成の実装)
-- [ ] ツイート案を返す
+- [x] repository名を受け取る
+- [x] GitHub APIで最新コミット情報を取得
+- [x] AIでツイート案を生成(OpenAI API等を使った文章生成の実装)
+- [x] ツイート案を返す
 
 ## 4. X（Twitter）API連携
 - [ ] X（Twitter）APIの調査・認証設定
