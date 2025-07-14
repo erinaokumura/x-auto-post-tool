@@ -32,9 +32,18 @@ def get_openai_api_key():
     return api_key
 
 # OpenAI APIでツイート案を生成
-def generate_tweet_with_openai(commit_message: str, repository: str) -> str:
+def generate_tweet_with_openai(commit_message: str, repository: str, language: str = 'ja') -> str:
     client = OpenAI(api_key=get_openai_api_key())
-    prompt = f"""
+    if language == 'en':
+        prompt = f"""
+You are an indie developer who is good at sharing information on X (formerly Twitter).
+Based on the following GitHub commit message, generate an engaging English tweet (within 140 characters, include at least one hashtag, in the style of Pieter Levels).
+
+Repository: {repository}
+Commit message: {commit_message}
+"""
+    else:
+        prompt = f"""
 あなたはX（旧Twitter）で情報発信が得意な個人開発者です。
 以下のGitHubコミットメッセージをもとに、インプレッションが伸びるような日本語のツイート文を1つ考えてください。
 
@@ -53,7 +62,6 @@ def generate_tweet_with_openai(commit_message: str, repository: str) -> str:
             max_tokens=100,
             temperature=0.8
         )
-        # response.choices[0].message.content が None の場合に備えてチェック
         content = response.choices[0].message.content if response.choices[0].message else None
         if content is None:
             raise HTTPException(status_code=500, detail="OpenAI APIからツイート案の生成に失敗しました")
@@ -175,6 +183,7 @@ def post_tweet_with_auth(req: TwitterTokenRequest) -> Any:
 class AutoPostTweetRequest(BaseModel):
     repository: str
     redirect_response: str
+    language: str = 'ja'
 
 class AutoPostTweetResponse(BaseModel):
     status: str
@@ -201,8 +210,8 @@ def auto_post_tweet(req: AutoPostTweetRequest) -> Any:
     if not data:
         raise HTTPException(status_code=404, detail="コミット情報が見つかりません")
     commit_message = data[0]["commit"]["message"]
-    # 2. OpenAIでツイート案を生成
-    tweet_text = generate_tweet_with_openai(commit_message, req.repository)
+    # 2. OpenAIでツイート案を生成（言語指定対応）
+    tweet_text = generate_tweet_with_openai(commit_message, req.repository, req.language)
     # 3. X認証→投稿
     if oauth2_handler is None:
         raise HTTPException(status_code=500, detail="認証フローが初期化されていません")
