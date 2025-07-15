@@ -31,6 +31,18 @@ python -m venv venv
 pip install fastapi uvicorn pytest httpx
 ```
 
+## 環境変数の設定
+
+1. プロジェクトルートにある`.env.example`をコピーして`.env`を作成してください。
+
+```sh
+cp .env.example .env
+```
+
+2. `.env`ファイル内の各APIキーやシークレット値を設定してください。
+
+- `.env`は**絶対にGit管理しないでください**（.gitignoreで除外済み）
+
 ## サーバーの起動
 
 ```

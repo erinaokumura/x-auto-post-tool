@@ -38,3 +38,15 @@ deactivate
 ## その他設定
 - CursorとGithubを連携する
   - https://www.genspark.ai/spark/cursor%E3%81%A8github%E3%81%AE%E9%80%A3%E6%90%BA%E6%89%8B%E9%A0%86/612143bb-739e-417c-90fd-120cd8b76073
+
+## 環境変数の設定
+
+1. プロジェクトルートにある`.env.example`をコピーして`.env`を作成してください。
+
+```sh
+cp .env.example .env
+```
+
+2. `.env`ファイル内の各APIキーやシークレット値を設定してください。
+
+- `.env`は**絶対にGit管理しないでください**（.gitignoreで除外済み）

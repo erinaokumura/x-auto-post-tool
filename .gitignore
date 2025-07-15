@@ -1,2 +1,6 @@
 ./__pycache__
+./app/__pycache__
 ./.pytest_cache
+./環境変数設定.md
+# .envファイルは絶対に公開しない
+.env
