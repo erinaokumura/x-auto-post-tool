@@ -28,6 +28,7 @@ uvicorn app.main:app --reload
 ## 5. 動作確認
 - ブラウザで `http://127.0.0.1:8000/` にアクセスし、`{"message": "Hello, FastAPI!"}` が表示されることを確認してください。
 - 自動ドキュメント: `http://127.0.0.1:8000/docs` 
+- http://127.0.0.1:8000/docs#/default/auto_post_tweet_api_auto_post_tweet_post
 
 ## 終了方法(venvの抜け方)
 ```
