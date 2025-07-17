@@ -5,17 +5,22 @@
 ```
 x-auto-post-tool/
 ├── app/
-│   └── main.py              # FastAPI本体
-├── tests/
-│   ├── test_main.py         # テストコード
-│   └── test_setup.md        # テスト実行手順
-├── docs/
-│   ├── api_design.md        # API設計
-│   ├── idea_summary.md      # アイデアまとめ
-│   └── todo.md              # TODOリスト
+│   ├── main.py              # FastAPI本体
+│   ├── config.py            # 設定管理
+│   ├── api/                 # APIルーター
+│   ├── services/            # ビジネスロジック
+│   ├── auth/                # 認証関連
+│   ├── schemas/             # データモデル
+│   └── utils/               # ユーティリティ
+├── tests/                   # テストコード
+├── docs/                    # ドキュメント
+│   ├── todo_list/           # TODOリスト
+│   └── dependencies.md      # 依存関係管理
+├── requirements.txt         # 本番環境依存関係
+├── requirements-dev.txt     # 開発環境依存関係
 ├── setup.md                 # セットアップ手順
 ├── README.md                # 全体説明・構成
-├── venv/                    # 仮想環境
+└── venv/                    # 仮想環境
 ```
 
 ## セットアップ
@@ -28,7 +33,12 @@ python -m venv venv
 
 2. 必要パッケージのインストール
 ```
-pip install fastapi uvicorn pytest httpx
+pip install -r requirements.txt
+```
+
+開発環境の場合（テスト・コード品質ツールを含む）:
+```
+pip install -r requirements-dev.txt
 ```
 
 ## 環境変数の設定
