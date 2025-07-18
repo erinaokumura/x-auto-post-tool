@@ -19,3 +19,5 @@ mkdocs-material==9.4.8
 
 # 型チェック
 types-requests==2.31.0.10 
+# 
+alembic==1.16.4

@@ -50,3 +50,23 @@ cp .env.example .env
 2. `.env`ファイル内の各APIキーやシークレット値を設定してください。
 
 - `.env`は**絶対にGit管理しないでください**（.gitignoreで除外済み）
+
+## 新しいパッケージの追加手順（開発用パッケージの場合）
+
+1. 仮想環境を有効化する
+   ```
+   venv\Scripts\activate
+   ```
+2. パッケージをインストールする（例: alembic）
+   ```
+   pip install alembic
+   ```
+3. requirements-dev.txtに追加する
+   ```
+   pip freeze | Select-String alembic >> requirements-dev.txt
+   ```
+   ※ `Select-String`はPowerShell用コマンドです。コマンドプロンプトの場合は`findstr`を使ってください。
+
+---
+
+本番用パッケージの場合は`requirements.txt`に追記してください。
