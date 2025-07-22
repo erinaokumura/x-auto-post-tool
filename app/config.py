@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     TWITTER_REDIRECT_URI: str = "http://127.0.0.1:8000/callback"
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
+    DATABASE_URL: str = ""
 
     class Config:
         env_file = ".env"

@@ -19,5 +19,6 @@ mkdocs-material==9.4.8
 
 # 型チェック
 types-requests==2.31.0.10 
-# 
+# DB移行
 alembic==1.16.4
+psycopg2-binary=2.9.10

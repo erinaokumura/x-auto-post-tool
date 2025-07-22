@@ -61,7 +61,7 @@ cp .env.example .env
    ```
    pip install alembic
    ```
-3. requirements-dev.txtに追加する
+3. 【※Binary filesになってしまうためやらない方がよさそう】requirements-dev.txtに追加する
    ```
    pip freeze | Select-String alembic >> requirements-dev.txt
    ```
