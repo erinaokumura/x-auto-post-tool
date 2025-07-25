@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
+load_dotenv()
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     GITHUB_API_URL: str = "https://api.github.com/repos/{repo}/commits"
@@ -11,6 +13,7 @@ class Settings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     DATABASE_URL: str = ""
+    ENCRYPTION_KEY: str = ""
 
     class Config:
         env_file = ".env"

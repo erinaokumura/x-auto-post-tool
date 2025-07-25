@@ -17,3 +17,16 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "ok"} 
+
+import redis
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+@app.post('/redis/set')
+def set_value(key: str, value: str):
+    r.set(key, value)
+    return {"result": "ok"}
+
+@app.get('/redis/get')
+def get_value(key: str):
+    value = r.get(key)
+    return {"value": value.decode() if value else None}
