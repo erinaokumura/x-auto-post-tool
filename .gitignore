@@ -4,3 +4,7 @@ __pycache__/
 .env
 alembic.ini
 
+# Next.js frontend関連の除外設定（実際に存在するもののみ）
+frontend/node_modules/
+frontend/.next/
+
