@@ -88,7 +88,6 @@ class OAuthService:
             return self.save_oauth_token(oauth_token.user_id, oauth_token.provider, new_token_data)
             
         except Exception as e:
-            print(f"Token refresh failed: {e}")
             return None
     
     def get_decrypted_access_token(self, user_id: int, provider: str) -> Optional[str]:

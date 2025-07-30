@@ -11,6 +11,4 @@ def post_tweet(access_token: str, tweet_text: str):
         "text": tweet_text
     }
     response = requests.post(url, headers=headers, json=json_data)
-    print(f"Status: {response.status_code}")
-    print(response.json())
     return response

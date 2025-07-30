@@ -48,7 +48,6 @@ class TokenService:
             return decrypted.decode()
         except Exception as e:
             # 復号化に失敗した場合（古い形式のトークンなど）
-            print(f"Token decryption failed: {e}")
             return None
     
     def is_token_expired(self, expires_at) -> bool:

@@ -19,7 +19,6 @@ def test_post_tweet(monkeypatch):
     client = TestClient(app)
 
     response = client.post("/api/post_tweet", json={"tweet": "テストツイート"})
-    print("RESPONSE:", response.status_code, response.text)
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok" 

@@ -19,7 +19,6 @@ def test_generate_tweet(monkeypatch):
     client = TestClient(app)
 
     response = client.post("/api/generate_tweet", json={"repository": "user/repo"})
-    print("RESPONSE:", response.status_code, response.text)
     assert response.status_code == 200
     data = response.json()
     assert data["commit_message"] == "fix: バグ修正"
