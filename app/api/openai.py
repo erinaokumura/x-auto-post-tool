@@ -18,9 +18,28 @@ def generate_tweet(
     fetch_latest_commit_message=Depends(get_fetch_latest_commit_message),
     generate_tweet_with_openai=Depends(get_generate_tweet_with_openai)
 ):
-    commit_message = fetch_latest_commit_message(req.repository)
-    tweet_draft = generate_tweet_with_openai(commit_message, req.repository)
-    return GenerateTweetResponse(
-        commit_message=commit_message,
-        tweet_draft=tweet_draft
-    ) 
+    try:
+        print(f"=== Generate Tweet API Called ===")
+        print(f"Repository: {req.repository}")
+        print(f"Language: {req.language}")
+        
+        commit_message = fetch_latest_commit_message(req.repository)
+        print(f"Commit message: {commit_message}")
+        
+        tweet_draft = generate_tweet_with_openai(commit_message, req.repository, req.language)
+        print(f"Generated tweet: {tweet_draft}")
+        
+        response = GenerateTweetResponse(
+            tweet_text=tweet_draft,
+            commit_message=commit_message,
+            repository=req.repository
+        )
+        print(f"Response: {response}")
+        
+        return response
+    except Exception as e:
+        print(f"ERROR in generate_tweet: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        raise 

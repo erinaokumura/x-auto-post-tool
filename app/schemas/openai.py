@@ -1,5 +1,6 @@
 from pydantic import BaseModel
  
 class GenerateTweetResponse(BaseModel):
+    tweet_text: str
     commit_message: str
-    tweet_draft: str 
+    repository: str 
