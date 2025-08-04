@@ -34,6 +34,7 @@ export default function DashboardPage() {
     setIsGenerating(true)
     setError('')
     setGeneratedTweet(null)
+    setEditableTweetText('')
     setPostResult(null)
 
     try {
@@ -55,6 +56,7 @@ export default function DashboardPage() {
 
       const data = await response.json()
       setGeneratedTweet(data)
+      setEditableTweetText(data.tweet_text)
     } catch (error) {
       console.error('ツイート生成エラー:', error)
       setError(error instanceof Error ? error.message : '予期しないエラーが発生しました')
@@ -77,7 +79,7 @@ export default function DashboardPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          tweet_text: generatedTweet.tweet_text 
+          tweet_text: editableTweetText 
         }),
       })
 
@@ -186,9 +188,9 @@ export default function DashboardPage() {
               {generatedTweet && (
                 <button
                   onClick={postTweet}
-                  disabled={isPosting}
+                  disabled={isPosting || editableTweetText.length > 280 || editableTweetText.trim().length === 0}
                   className={`px-4 py-2 rounded-md font-medium ${
-                    isPosting
+                    isPosting || editableTweetText.length > 280 || editableTweetText.trim().length === 0
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-green-600 hover:bg-green-700'
                   } text-white`}
@@ -198,12 +200,33 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* 生成されたツイート表示 */}
+            {/* 生成されたツイート表示・編集 */}
             {generatedTweet && (
               <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">生成されたツイート</h3>
-                <div className="bg-white border rounded-md p-3 mb-3">
-                  <p className="text-gray-900">{generatedTweet.tweet_text}</p>
+                <div className="mb-3">
+                  <label htmlFor="tweetEdit" className="block text-xs font-medium text-gray-700 mb-1">
+                    ツイート内容（編集可能）
+                  </label>
+                  <textarea
+                    id="tweetEdit"
+                    value={editableTweetText}
+                    onChange={(e) => setEditableTweetText(e.target.value)}
+                    rows={4}
+                    maxLength={280}
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    placeholder="ツイート内容を編集..."
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-500">
+                      {editableTweetText.length}/280文字
+                    </span>
+                    {editableTweetText.length > 280 && (
+                      <span className="text-xs text-red-500 font-medium">
+                        文字数制限を超えています
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-xs text-gray-500">
                   <p>リポジトリ: {generatedTweet.repository}</p>
