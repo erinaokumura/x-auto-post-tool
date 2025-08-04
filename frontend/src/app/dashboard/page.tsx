@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isPosting, setIsPosting] = useState(false)
   const [generatedTweet, setGeneratedTweet] = useState<TweetResponse | null>(null)
+  const [editableTweetText, setEditableTweetText] = useState('')
   const [postResult, setPostResult] = useState<PostResponse | null>(null)
   const [error, setError] = useState('')
 
