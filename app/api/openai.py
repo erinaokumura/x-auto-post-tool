@@ -21,6 +21,7 @@ def generate_tweet(
     commit_message = fetch_latest_commit_message(req.repository)
     tweet_draft = generate_tweet_with_openai(commit_message, req.repository)
     return GenerateTweetResponse(
+        tweet_text=tweet_draft,
         commit_message=commit_message,
-        tweet_draft=tweet_draft
+        repository=req.repository
     ) 
