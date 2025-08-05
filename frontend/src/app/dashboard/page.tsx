@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 interface TweetResponse {
-  tweet_text: string
+  tweet_draft: string
   commit_message: string
   repository: string
 }
@@ -56,7 +56,7 @@ export default function DashboardPage() {
 
       const data = await response.json()
       setGeneratedTweet(data)
-      setEditableTweetText(data.tweet_text)
+      setEditableTweetText(data.tweet_draft)
     } catch (error) {
       console.error('ツイート生成エラー:', error)
       setError(error instanceof Error ? error.message : '予期しないエラーが発生しました')
