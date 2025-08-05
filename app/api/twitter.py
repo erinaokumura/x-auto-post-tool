@@ -28,7 +28,7 @@ def post_tweet(
         raise HTTPException(status_code=401, detail="Twitter認証が必要です")
     
     try:
-        response = post_tweet_v2(access_token, req.tweet)
+        response = post_tweet_v2(access_token, req.tweet_text)
         return PostTweetResponse(status="ok", tweet_response=response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ツイート投稿エラー: {str(e)}")

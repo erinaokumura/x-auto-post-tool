@@ -25,7 +25,8 @@ def generate_tweet(
         tweet_draft = generate_tweet_with_openai(commit_message, req.repository, language)
         response = GenerateTweetResponse(
             tweet_draft=tweet_draft,
-            commit_message=commit_message
+            commit_message=commit_message,
+            repository=req.repository
         )
         return response
     except Exception as e:

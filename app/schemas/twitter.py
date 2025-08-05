@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Any
 
 class PostTweetRequest(BaseModel):
-    tweet: str
+    tweet_text: str
 
 class PostTweetResponse(BaseModel):
     status: str
