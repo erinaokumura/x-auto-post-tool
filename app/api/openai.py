@@ -18,9 +18,16 @@ def generate_tweet(
     fetch_latest_commit_message=Depends(get_fetch_latest_commit_message),
     generate_tweet_with_openai=Depends(get_generate_tweet_with_openai)
 ):
-    commit_message = fetch_latest_commit_message(req.repository)
-    tweet_draft = generate_tweet_with_openai(commit_message, req.repository)
-    return GenerateTweetResponse(
-        commit_message=commit_message,
-        tweet_draft=tweet_draft
-    ) 
+    try:
+        # 安全にlanguageにアクセス
+        language = getattr(req, 'language', 'ja')
+        commit_message = fetch_latest_commit_message(req.repository)
+        tweet_draft = generate_tweet_with_openai(commit_message, req.repository, language)
+        response = GenerateTweetResponse(
+            tweet_draft=tweet_draft,
+            commit_message=commit_message
+        )
+        return response
+    except Exception as e:
+        import traceback
+        raise 
