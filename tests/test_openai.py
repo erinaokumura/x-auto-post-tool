@@ -18,7 +18,7 @@ def test_generate_tweet(monkeypatch):
     app.dependency_overrides[get_generate_tweet_with_openai] = lambda: mock_generate_tweet_with_openai
     client = TestClient(app)
 
-    response = client.post("/api/generate_tweet", json={"repository": "user/repo"})
+    response = client.post("/api/generate_tweet", json={"repository": "user/repo", "language": "ja"})
     assert response.status_code == 200
     data = response.json()
     assert data["commit_message"] == "fix: バグ修正"
