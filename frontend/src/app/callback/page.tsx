@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -9,9 +9,15 @@ export default function CallbackPage() {
   const [message, setMessage] = useState('')
   const searchParams = useSearchParams()
   const router = useRouter()
+  const hasProcessed = useRef(false) // 重複実行を防ぐフラグ
 
   useEffect(() => {
     const handleCallback = async () => {
+      // 既に処理済みの場合は何もしない
+      if (hasProcessed.current) {
+        return
+      }
+
       const code = searchParams.get('code')
       const state = searchParams.get('state')
 
@@ -20,6 +26,9 @@ export default function CallbackPage() {
         setMessage('認証パラメータが不足しています')
         return
       }
+
+      // 処理開始前にフラグを設定
+      hasProcessed.current = true
 
       try {
         const response = await fetch('/api/auth/twitter/callback', {
@@ -48,6 +57,8 @@ export default function CallbackPage() {
         console.error('コールバック処理エラー:', error)
         setStatus('error')
         setMessage(error instanceof Error ? error.message : '予期しないエラーが発生しました')
+        // エラー時はフラグをリセット（リトライ可能にする）
+        hasProcessed.current = false
       }
     }
 

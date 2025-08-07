@@ -141,7 +141,10 @@ def twitter_callback(
         oauth_data_json = oauth_redis.get(f"{OAUTH_STATE_PREFIX}{req.state}")
         
         if not oauth_data_json:
-            raise HTTPException(status_code=400, detail="認証セッションが期限切れまたは見つかりません")
+            raise HTTPException(
+                status_code=400, 
+                detail="認証セッションが期限切れまたは見つかりません。既に処理済みの可能性があります。"
+            )
         
         oauth_data = json.loads(oauth_data_json)
         
@@ -211,9 +214,13 @@ def twitter_callback(
             }
         }
         
+    except HTTPException as http_exc:
+        # HTTPExceptionは再発生させる
+        raise http_exc
     except Exception as e:
-        # エラー時も認証状態をクリア
-        oauth_redis.delete(f"{OAUTH_STATE_PREFIX}{req.state}")
+        # 予期しないエラー時のみ認証状態をクリア
+        if oauth_redis.exists(f"{OAUTH_STATE_PREFIX}{req.state}"):
+            oauth_redis.delete(f"{OAUTH_STATE_PREFIX}{req.state}")
         raise HTTPException(status_code=400, detail=f"認証処理エラー: {str(e)}")
 
 # Dependsでセッションからユーザー取得
