@@ -4,7 +4,8 @@ from app.services.oauth_service import OAuthService
 from app.auth.twitter_oauth import get_oauth2_handler, fetch_token
 from app.db import get_db
 from app.models import User
-from pydantic import BaseModel
+from app.middleware.rate_limiter import user_limiter, limiter
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import Session
 from typing import Optional
 import tweepy
@@ -22,12 +23,42 @@ OAUTH_STATE_PREFIX = "oauth_state:"
 OAUTH_STATE_TTL = 600  # 10分
 
 class LoginRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=50, 
+        pattern=r'^[a-zA-Z0-9_.-]+$',
+        description="ユーザー名（英数字、アンダースコア、ドット、ハイフンのみ）"
+    )
+    password: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=100,
+        description="パスワード"
+    )
 
 class OAuthCallbackRequest(BaseModel):
-    code: str
-    state: str
+    code: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=500,
+        description="OAuth認証コード"
+    )
+    state: str = Field(
+        ..., 
+        min_length=1, 
+        max_length=200,
+        description="OAuth状態パラメータ"
+    )
+    
+    @field_validator('code', 'state')
+    @classmethod
+    def validate_oauth_params(cls, v):
+        # OAuth パラメータのセキュリティチェック
+        dangerous_chars = ['<', '>', '"', "'", ';', '|', '&']
+        if any(char in v for char in dangerous_chars):
+            raise ValueError('不正な文字が含まれています')
+        return v.strip()
 
 def get_session_service():
     return SessionService
@@ -36,14 +67,15 @@ def get_oauth_service(db: Session = Depends(get_db)):
     return OAuthService(db)
 
 @router.post("/login")
-def login(response: Response, req: LoginRequest, session_service=Depends(get_session_service)):
+@limiter.limit("10/minute")  # ログイン試行の制限
+def login(request: Request, response: Response, req: LoginRequest, session_service=Depends(get_session_service)):
     user_id = fake_authenticate(req.username, req.password)
     session_id = session_service.create_session(user_id)
     response.set_cookie(
         key="session_id",
         value=session_id,
         httponly=True,
-        secure=False,  # 本番はTrue
+        secure=settings.ENVIRONMENT == "production",  # 本番環境ではTrue
         samesite="lax",
         max_age=1800
     )
@@ -68,7 +100,8 @@ def logout(
     return {"message": "ログアウトしました"}
 
 @router.get("/twitter/login")
-def twitter_login():
+@limiter.limit("20/minute")  # OAuth開始の制限
+def twitter_login(request: Request):
     """Twitter OAuth2.0 PKCE認証開始"""
     try:
         # Redisの接続確認
@@ -128,7 +161,9 @@ def twitter_login():
         raise HTTPException(status_code=500, detail=f"Twitter認証エラー: {str(redis_error)}")
 
 @router.post("/twitter/callback")
+@limiter.limit("30/minute")  # OAuth コールバックの制限
 def twitter_callback(
+    request: Request,
     req: OAuthCallbackRequest,
     response: Response,
     session_service=Depends(get_session_service),
@@ -196,7 +231,7 @@ def twitter_callback(
             key="session_id",
             value=session_id,
             httponly=True,
-            secure=False,  # 本番はTrue
+            secure=settings.ENVIRONMENT == "production",  # 本番環境ではTrue
             samesite="lax",
             max_age=1800
         )

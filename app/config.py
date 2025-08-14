@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     DATABASE_URL: str = ""
     ENCRYPTION_KEY: str = ""
+    
+    # CORS設定
+    CORS_ORIGINS: str = "http://localhost:3000,https://*.vercel.app"
+    ENVIRONMENT: str = "development"  # development, production
 
     class Config:
         env_file = ".env"

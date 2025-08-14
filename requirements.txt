@@ -32,3 +32,7 @@ sqlalchemy==2.0.36
 
 # 暗号化関連
 cryptography==44.0.0
+
+# セキュリティ関連
+slowapi==0.1.9
+limits==5.5.0

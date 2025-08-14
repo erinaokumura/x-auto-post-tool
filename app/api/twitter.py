@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from app.schemas.twitter import (
     PostTweetRequest, PostTweetResponse,
     TwitterAuthRequest, TwitterAuthResponse,
@@ -10,12 +10,15 @@ from app.services.oauth_service import OAuthService
 from app.db import get_db
 from app.api.auth import get_current_user
 from app.models import User
+from app.middleware.rate_limiter import user_limiter
 from sqlalchemy.orm import Session
 
 router = APIRouter()
 
 @router.post("/post_tweet", response_model=PostTweetResponse)
+@user_limiter.limit("10/minute")  # 1分間に10回まで
 def post_tweet(
+    request: Request,
     req: PostTweetRequest, 
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -29,12 +32,19 @@ def post_tweet(
     
     try:
         response = post_tweet_v2(access_token, req.tweet_text)
-        return PostTweetResponse(status="ok", tweet_response=response)
+        tweet_id = response.get("data", {}).get("id") if response else None
+        return PostTweetResponse(
+            success=True,
+            tweet_id=tweet_id,
+            message="ツイートが正常に投稿されました"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ツイート投稿エラー: {str(e)}")
 
 @router.post("/auto_post_tweet", response_model=AutoPostTweetResponse)
+@user_limiter.limit("5/minute")  # より厳しい制限（AI処理を含むため）
 def auto_post_tweet(
+    request: Request,
     req: AutoPostTweetRequest,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
