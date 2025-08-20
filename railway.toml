@@ -1,0 +1,18 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[environments.production]
+# 本番環境設定
+[environments.production.variables]
+ENVIRONMENT = "production"
+
+[environments.development]
+# 開発環境設定  
+[environments.development.variables]
+ENVIRONMENT = "development"
+

@@ -41,6 +41,18 @@ cp env.production.template .env.production
 
 詳細は [docs/environment_setup.md](docs/environment_setup.md) を参照してください。
 
+## Railway + Vercel デプロイ構成
+
+### アーキテクチャ
+- **フロントエンド**: Vercel (Next.js)
+- **バックエンド**: Railway (FastAPI)
+- **データベース**: Railway (PostgreSQL + Redis)
+
+### Railway デプロイ手順
+1. GitHubリポジトリをRailwayに接続
+2. 環境変数を設定（本番環境）
+3. 自動デプロイが実行される
+
 ### 2. 仮想環境の作成・有効化（Windows PowerShellの場合）
 ```
 python -m venv venv
