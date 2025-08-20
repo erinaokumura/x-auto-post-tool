@@ -1,9 +1,14 @@
+# Python 3.13互換性要件
+# 注意: Python 3.13を使用する場合、以下のパッケージは特定のバージョンが必要です
+# インストール時はバイナリパッケージを優先: pip install --only-binary=all psycopg2-binary
+
 # FastAPI関連
 fastapi==0.115.14
 uvicorn==0.35.0
 
 # 設定管理
 pydantic==2.11.7
+pydantic-core==2.33.2  # Python 3.13互換性のため明示的に指定
 pydantic-settings==2.10.1
 typing-inspection==0.4.1
 
@@ -27,12 +32,20 @@ python-dotenv==1.1.1
 redis==6.2.0
 
 # データベース関連
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10  # Python 3.13互換性のため更新
 sqlalchemy==2.0.36
 
 # 暗号化関連
 cryptography==44.0.0
+cffi==1.17.1  # cryptography依存関係のため明示的に指定
 
 # セキュリティ関連
 slowapi==0.1.9
 limits==5.5.0
+
+# 最適化・監視関連
+psutil==5.9.6
+chardet==5.2.0
+
+# マイグレーション
+alembic==1.14.0

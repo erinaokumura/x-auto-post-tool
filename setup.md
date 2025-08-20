@@ -20,9 +20,33 @@ https://qiita.com/ponsuke0531/items/4629626a3e84bcd9398f
 pip install -r requirements.txt
 ```
 
+### Python 3.13使用時の注意事項
+Python 3.13を使用する場合、一部のバイナリパッケージで互換性の問題が発生する可能性があります。
+以下の手順で解決できます：
+
+1. **依存関係エラーが発生した場合：**
+   ```
+   # 問題のあるパッケージを個別に再インストール
+   pip uninstall pydantic pydantic-core cryptography psycopg2-binary cffi -y
+   pip install --upgrade pip setuptools wheel
+   pip install pydantic==2.11.7 pydantic-core==2.33.2
+   pip install cryptography==44.0.0 cffi==1.17.1
+   pip install --only-binary=all psycopg2-binary==2.9.10
+   ```
+
+2. **バイナリパッケージの優先インストール（推奨）：**
+   ```
+   pip install --only-binary=all psycopg2-binary
+   ```
+
 ## 4. サーバーの起動
 ```
 uvicorn app.main:app --reload
+```
+
+※開発時の動作確認時はhttpを許可する
+```
+$env:OAUTHLIB_INSECURE_TRANSPORT="1"
 ```
 
 ## 5. 動作確認
@@ -70,3 +94,52 @@ cp .env.example .env
 ---
 
 本番用パッケージの場合は`requirements.txt`に追記してください。
+
+## トラブルシューティング
+
+### 起動時のModuleNotFoundErrorについて
+
+#### 1. `ModuleNotFoundError: No module named 'pydantic_core._pydantic_core'`
+**原因:** PydanticとPydantic-coreのバージョン不整合
+**解決方法:**
+```
+pip uninstall pydantic pydantic-core -y
+pip install pydantic==2.11.7 pydantic-core==2.33.2
+```
+
+#### 2. `ModuleNotFoundError: No module named '_cffi_backend'`
+**原因:** cryptographyの依存関係（cffi）の問題
+**解決方法:**
+```
+pip uninstall cryptography cffi -y
+pip install cryptography==44.0.0 cffi==1.17.1
+```
+
+#### 3. `ModuleNotFoundError: No module named 'psycopg2._psycopg'`
+**原因:** psycopg2-binaryのPython 3.13互換性問題
+**解決方法:**
+```
+pip uninstall psycopg2-binary -y
+pip install --only-binary=all psycopg2-binary==2.9.10
+```
+
+### 一括解決手順
+上記のエラーが複数発生する場合は、以下を順次実行：
+```
+# 1. 仮想環境をactivate
+.\venv\Scripts\Activate.ps1
+
+# 2. 問題のあるパッケージをすべてアンインストール
+pip uninstall pydantic pydantic-core cryptography psycopg2-binary cffi -y
+
+# 3. pipを最新版に更新
+python -m pip install --upgrade pip setuptools wheel
+
+# 4. パッケージを正しい順序で再インストール
+pip install pydantic==2.11.7 pydantic-core==2.33.2
+pip install cryptography==44.0.0 cffi==1.17.1
+pip install --only-binary=all psycopg2-binary==2.9.10
+
+# 5. FastAPIを再インストール（依存関係を確実にする）
+pip install --force-reinstall fastapi==0.115.14
+```

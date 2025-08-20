@@ -14,39 +14,56 @@ class OAuthService:
     
     def save_oauth_token(self, user_id: int, provider: str, token_data: Dict[str, Any]) -> OAuthToken:
         """OAuthトークンを暗号化してデータベースに保存"""
-        # 既存のトークンを無効化
-        self.db.query(OAuthToken).filter(
-            OAuthToken.user_id == user_id,
-            OAuthToken.provider == provider,
-            OAuthToken.is_active == True
-        ).update({"is_active": False})
-        
-        # 有効期限の計算
-        expires_at = None
-        if 'expires_in' in token_data:
-            expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data['expires_in'])
-        
-        # トークンを暗号化
-        encrypted_access_token = self.token_service.encrypt_token(token_data.get('access_token', ''))
-        encrypted_refresh_token = self.token_service.encrypt_token(token_data.get('refresh_token', ''))
-        
-        # 新しいトークンレコードを作成
-        oauth_token = OAuthToken(
-            user_id=user_id,
-            provider=provider,
-            access_token=encrypted_access_token,
-            refresh_token=encrypted_refresh_token,
-            token_type=token_data.get('token_type', 'Bearer'),
-            expires_at=expires_at,
-            scope=token_data.get('scope', ''),
-            is_active=True
-        )
-        
-        self.db.add(oauth_token)
-        self.db.commit()
-        self.db.refresh(oauth_token)
-        
-        return oauth_token
+        try:
+            # 既存のトークンを検索
+            existing_token = self.db.query(OAuthToken).filter(
+                OAuthToken.user_id == user_id,
+                OAuthToken.provider == provider
+            ).first()
+            
+            # 有効期限の計算
+            expires_at = None
+            if 'expires_in' in token_data:
+                expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data['expires_in'])
+            
+            # トークンを暗号化
+            encrypted_access_token = self.token_service.encrypt_token(token_data.get('access_token', ''))
+            encrypted_refresh_token = self.token_service.encrypt_token(token_data.get('refresh_token', ''))
+            
+            if existing_token:
+                # 既存のトークンを更新
+                existing_token.access_token = encrypted_access_token
+                existing_token.refresh_token = encrypted_refresh_token
+                existing_token.token_type = token_data.get('token_type', 'Bearer')
+                existing_token.expires_at = expires_at
+                existing_token.scope = token_data.get('scope', '')
+                existing_token.is_active = True
+                existing_token.updated_at = datetime.now(timezone.utc)
+                
+                self.db.commit()
+                self.db.refresh(existing_token)
+                return existing_token
+            else:
+                # 新しいトークンレコードを作成
+                oauth_token = OAuthToken(
+                    user_id=user_id,
+                    provider=provider,
+                    access_token=encrypted_access_token,
+                    refresh_token=encrypted_refresh_token,
+                    token_type=token_data.get('token_type', 'Bearer'),
+                    expires_at=expires_at,
+                    scope=token_data.get('scope', ''),
+                    is_active=True
+                )
+                
+                self.db.add(oauth_token)
+                self.db.commit()
+                self.db.refresh(oauth_token)
+                return oauth_token
+                
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"トークン保存エラー: {str(e)}")
     
     def get_valid_token(self, user_id: int, provider: str) -> Optional[OAuthToken]:
         """有効なOAuthトークンを取得（必要に応じてリフレッシュ）"""

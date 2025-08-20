@@ -18,7 +18,15 @@ from app.config import settings
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Redisクライアント（OAuth状態管理用）
-oauth_redis = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=1, decode_responses=True)
+# OAuth用Redis接続（本番環境対応）
+def get_oauth_redis():
+    redis_url = settings.get_redis_url()
+    if settings.REDIS_URL:
+        return redis.from_url(redis_url, db=1, decode_responses=True)
+    else:
+        return redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=1, decode_responses=True)
+
+oauth_redis = get_oauth_redis()
 OAUTH_STATE_PREFIX = "oauth_state:"
 OAUTH_STATE_TTL = 600  # 10分
 
@@ -202,7 +210,8 @@ def twitter_callback(
         handler.state = oauth_data["state"]
         
         # トークンを取得
-        redirect_url = f"http://localhost:8000/callback?code={req.code}&state={req.state}"
+        redirect_url = f"http://127.0.0.1:8000/callback?code={req.code}&state={req.state}"
+        # redirect_url = f"http://localhost:8000/callback?code={req.code}&state={req.state}"
         token_data = fetch_token(handler, redirect_url)
         
         # Twitter APIクライアントを作成してユーザー情報を取得

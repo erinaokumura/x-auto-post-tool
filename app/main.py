@@ -22,8 +22,8 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS設定
-cors_origins = settings.CORS_ORIGINS.split(",") if settings.CORS_ORIGINS else ["*"]
+# CORS設定（本番環境対応）
+cors_origins = settings.get_cors_origins()
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,6 +37,14 @@ app.add_middleware(
 app.include_router(twitter.router, prefix="/api")
 app.include_router(openai.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
+
+# システム管理API
+from app.api import system
+app.include_router(system.router, prefix="/api/system")
+
+# グローバル例外ハンドラー
+from app.utils.error_handler import global_exception_handler
+app.add_exception_handler(Exception, global_exception_handler)
 
 @app.get("/")
 def read_root():

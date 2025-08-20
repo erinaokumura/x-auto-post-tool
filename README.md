@@ -25,7 +25,23 @@ x-auto-post-tool/
 
 ## セットアップ
 
-1. 仮想環境の作成・有効化（Windows PowerShellの場合）
+### 1. 環境設定ファイルの準備
+
+環境ごとに適切な設定ファイルを作成してください：
+
+```bash
+# 開発環境用
+cp env.development.template .env.development
+# 実際の値を設定して編集
+
+# 本番環境用
+cp env.production.template .env.production  
+# 実際の値を設定して編集
+```
+
+詳細は [docs/environment_setup.md](docs/environment_setup.md) を参照してください。
+
+### 2. 仮想環境の作成・有効化（Windows PowerShellの場合）
 ```
 python -m venv venv
 .\venv\Scripts\Activate.ps1
