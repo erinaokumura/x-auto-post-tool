@@ -15,12 +15,16 @@ COPY requirements.txt .
 RUN python -m pip install --upgrade pip setuptools wheel
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
+# 起動スクリプトをコピーして実行権限を付与
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 # アプリケーションコードをコピー
 COPY . .
 
 # Railwayが自動設定するPORT環境変数を使用
 EXPOSE 8000
 
-# アプリケーション起動
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# 起動スクリプトを実行
+CMD ["/start.sh"]
 
