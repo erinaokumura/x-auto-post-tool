@@ -51,34 +51,21 @@ def load_environment_config():
     environment = os.getenv("ENVIRONMENT", "development")
     
     # Railwayの場合は環境変数が直接設定されているので.envファイル読み込みをスキップ
-    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("DATABASE_URL"):
-        print("Railway環境を検出しました。環境変数を直接使用します。")
+    if os.getenv("RAILWAY_ENVIRONMENT"):
         return environment
     
     # ローカル環境では.envファイルを読み込む
-    print("ローカル環境で.envファイルを読み込みます。")
-    # まず基本の.envがあれば読み込む（後から環境固有で上書き）
     detect_and_load_dotenv(".env")
     
     # 環境固有の.envファイルを読み込み
     env_file = f".env.{environment}"
     if detect_and_load_dotenv(env_file):
         print(f"環境固有ファイル {env_file} を読み込みました")
-    else:
-        print(f"環境固有ファイル {env_file} が見つかりません。基本設定を使用します。")
     
     return environment
 
 # 環境設定の読み込み
 current_environment = load_environment_config()
-
-# デバッグ: 環境変数の確認
-import os
-print("=== 環境変数デバッグ ===")
-print(f"DATABASE_URL: {os.getenv('DATABASE_URL', 'NOT SET')}")
-print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT', 'NOT SET')}")
-print(f"OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY', 'NOT SET')[:10]}..." if os.getenv('OPENAI_API_KEY') else "OPENAI_API_KEY: NOT SET")
-print("========================")
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
@@ -116,12 +103,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = 'utf-8'
-        # エンコーディングエラーを無視する設定
-        env_ignore_empty = True
-        # Railwayの環境変数を優先して読み込む
-        case_sensitive = True
-        # 環境変数の値を取得する際に空文字を許可しない
-        validate_assignment = True
+        case_sensitive = False
     
     def get_redis_url(self) -> str:
         """
