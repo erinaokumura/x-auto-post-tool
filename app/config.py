@@ -47,11 +47,18 @@ def load_environment_config():
     """
     環境変数ENVIRONMENTに基づいて適切な.envファイルを読み込む
     """
+    # ENVIRONMENT環境変数を先に取得
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    # Railwayの場合は環境変数が直接設定されているので.envファイル読み込みをスキップ
+    if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("DATABASE_URL"):
+        print("Railway環境を検出しました。環境変数を直接使用します。")
+        return environment
+    
+    # ローカル環境では.envファイルを読み込む
+    print("ローカル環境で.envファイルを読み込みます。")
     # まず基本の.envがあれば読み込む（後から環境固有で上書き）
     detect_and_load_dotenv(".env")
-    
-    # ENVIRONMENT環境変数を取得（デフォルトは development）
-    environment = os.getenv("ENVIRONMENT", "development")
     
     # 環境固有の.envファイルを読み込み
     env_file = f".env.{environment}"
@@ -64,6 +71,15 @@ def load_environment_config():
 
 # 環境設定の読み込み
 current_environment = load_environment_config()
+
+# デバッグ: 環境変数の確認
+import os
+print("=== 環境変数デバッグ ===")
+print(f"DATABASE_URL: {os.getenv('DATABASE_URL', 'NOT SET')}")
+print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT', 'NOT SET')}")
+print(f"OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY', 'NOT SET')[:10]}..." if os.getenv('OPENAI_API_KEY') else "OPENAI_API_KEY: NOT SET")
+print("========================")
+
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     GITHUB_API_URL: str = "https://api.github.com/repos/{repo}/commits"
@@ -102,6 +118,10 @@ class Settings(BaseSettings):
         env_file_encoding = 'utf-8'
         # エンコーディングエラーを無視する設定
         env_ignore_empty = True
+        # Railwayの環境変数を優先して読み込む
+        case_sensitive = True
+        # 環境変数の値を取得する際に空文字を許可しない
+        validate_assignment = True
     
     def get_redis_url(self) -> str:
         """
