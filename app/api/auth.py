@@ -207,8 +207,7 @@ def twitter_callback(
         handler.state = oauth_data["state"]
         
         # トークンを取得
-        redirect_url = f"http://127.0.0.1:8000/callback?code={req.code}&state={req.state}"
-        # redirect_url = f"http://localhost:8000/callback?code={req.code}&state={req.state}"
+        redirect_url = f"{settings.TWITTER_REDIRECT_URI}?code={req.code}&state={req.state}"
         token_data = fetch_token(handler, redirect_url)
         
         # Twitter APIクライアントを作成してユーザー情報を取得
