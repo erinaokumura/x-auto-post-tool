@@ -31,12 +31,14 @@ export default function CallbackPage() {
       hasProcessed.current = true
 
       try {
-        const response = await fetch('/api/auth/twitter/callback', {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+        const response = await fetch(`${backendUrl}/api/auth/twitter/callback`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ code, state }),
+          credentials: 'include', // クッキーを含める
         })
 
         if (!response.ok) {
