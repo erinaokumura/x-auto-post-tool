@@ -21,10 +21,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # OAuth用Redis接続（本番環境対応）
 def get_oauth_redis():
     redis_url = settings.get_redis_url()
-    if settings.REDIS_URL:
-        return redis.from_url(redis_url, db=1, decode_responses=True)
-    else:
-        return redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=1, decode_responses=True)
+    return redis.from_url(redis_url, db=1, decode_responses=True)
 
 oauth_redis = get_oauth_redis()
 OAUTH_STATE_PREFIX = "oauth_state:"

@@ -76,8 +76,6 @@ class Settings(BaseSettings):
     TWITTER_ACCESS_TOKEN: str = ""
     TWITTER_ACCESS_TOKEN_SECRET: str = ""
     TWITTER_REDIRECT_URI: str = "http://127.0.0.1:8000/callback"  # 本番では Railway ドメインに変更
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
     REDIS_URL: str = ""  # Railway Redis URL (本番環境で使用)
     DATABASE_URL: str = ""
     ENCRYPTION_KEY: str = ""
@@ -116,7 +114,7 @@ class Settings(BaseSettings):
             # フォールバック: ローカルRedis（開発環境のみ）
             if self.is_production():
                 raise ValueError("本番環境ではREDIS_URLの設定が必須です")
-            return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+            return "redis://localhost:6379"  # ローカル開発環境用のデフォルト
     
     def is_production(self) -> bool:
         """

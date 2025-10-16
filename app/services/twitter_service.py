@@ -19,7 +19,7 @@ def get_redis_client():
     if settings.REDIS_URL:
         return redis.from_url(redis_url, decode_responses=True)
     else:
-        return redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        return redis.from_url(settings.get_redis_url(), decode_responses=True)
 
 redis_client = get_redis_client()
 

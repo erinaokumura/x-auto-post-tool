@@ -27,10 +27,7 @@ logger = logging.getLogger(__name__)
 try:
     # Redis接続（本番環境対応）
     redis_url = settings.get_redis_url()
-    if settings.REDIS_URL:
-        redis_client = redis.from_url(redis_url, decode_responses=True)
-    else:
-        redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+    redis_client = redis.from_url(redis_url, decode_responses=True)
 except Exception as e:
     logger.warning(f"Redis接続エラー（エラー統計無効）: {e}")
     redis_client = None

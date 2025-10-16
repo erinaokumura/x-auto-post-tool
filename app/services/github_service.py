@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 # Redis接続（本番環境対応）
 def get_redis_client():
     redis_url = settings.get_redis_url()
-    if settings.REDIS_URL:
-        return redis.from_url(redis_url, decode_responses=True)
-    else:
-        return redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+    return redis.from_url(redis_url, decode_responses=True)
 
 redis_client = get_redis_client()
 

@@ -1,5 +1,4 @@
 __pycache__/
-./環境変数設定.md
 # 環境設定ファイルは絶対に公開しない
 .env
 .env.development

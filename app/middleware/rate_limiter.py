@@ -11,21 +11,11 @@ try:
     import redis
     # 本番環境対応のRedis接続
     redis_url = settings.get_redis_url()
-    if settings.REDIS_URL:
-        # Railway等の本番環境
-        redis_client = redis.from_url(redis_url, db=2, decode_responses=True)
-    else:
-        # ローカル環境
-        redis_client = redis.Redis(
-            host=settings.REDIS_HOST, 
-            port=settings.REDIS_PORT, 
-            db=2,  # レート制限専用DB
-            decode_responses=True
-        )
+    redis_client = redis.from_url(redis_url, db=2, decode_responses=True)
     # 接続テスト
     redis_client.ping()
     redis_available = True
-    print(f"Redis接続成功: {redis_url if settings.REDIS_URL else f'{settings.REDIS_HOST}:{settings.REDIS_PORT}'}")
+    print(f"Redis接続成功: {redis_url}")
 except ImportError:
     print("redisモジュールが見つかりません。メモリ内でレート制限を実行します。")
 except Exception as e:
@@ -40,7 +30,7 @@ temp_env_file.close()
 # Limiterの設定
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri=f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/2" if redis_available else "memory://",
+    storage_uri=f"{settings.get_redis_url()}/2" if redis_available else "memory://",
     enabled=True,
     config_filename=temp_env_file.name  # 空のUTF-8ファイルを指定
 )
@@ -84,7 +74,7 @@ def rate_limit_key_func(request: Request):
 # ユーザー用Limiter
 user_limiter = Limiter(
     key_func=rate_limit_key_func,
-    storage_uri=f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/2" if redis_available else "memory://",
+    storage_uri=f"{settings.get_redis_url()}/2" if redis_available else "memory://",
     enabled=True,
     config_filename=temp_env_file.name  # 同じ空のUTF-8ファイルを指定
 )

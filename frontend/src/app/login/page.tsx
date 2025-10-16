@@ -14,12 +14,18 @@ export default function LoginPage() {
     setErrorMessage('')
 
     try {
-      // FastAPIのTwitter認証エンドポイントを呼び出し
-      const response = await fetch('/api/auth/twitter/login', {
+      // 環境変数からバックエンドURLを取得
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+      console.log('🔧 Frontend - Backend URL:', backendUrl);
+      
+      // FastAPIのTwitter認証エンドポイントを直接呼び出し
+      const response = await fetch(`${backendUrl}/api/auth/twitter/login`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        // CORS設定
+        mode: 'cors',
       })
 
       if (!response.ok) {

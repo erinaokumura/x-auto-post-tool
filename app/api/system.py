@@ -44,7 +44,7 @@ def health_check():
         if settings.REDIS_URL:
             redis_client = redis.from_url(redis_url)
         else:
-            redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
+            redis_client = redis.from_url(settings.get_redis_url())
         redis_client.ping()
         health_data["services"]["redis"] = "healthy"
     except Exception as e:
@@ -88,7 +88,7 @@ def get_system_metrics():
             if settings.REDIS_URL:
                 redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
             else:
-                redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+                redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
             redis_info = redis_client.info()
             metrics["redis"] = {
                 "used_memory_mb": round(redis_info.get("used_memory", 0) / (1024**2), 2),
@@ -108,7 +108,7 @@ def get_cache_statistics():
     """キャッシュ統計を取得"""
     try:
         from app.config import settings
-        redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
         
         # キャッシュキー統計
         github_keys = redis_client.keys("github_commit:*")
@@ -148,7 +148,7 @@ def clear_cache(
     """キャッシュをクリア（管理者機能）"""
     try:
         from app.config import settings
-        redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
         
         cleared_count = 0
         
@@ -183,7 +183,7 @@ def get_performance_history():
     """パフォーマンス履歴を取得"""
     try:
         from app.config import settings
-        redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
         
         # パフォーマンス履歴データを取得（最新50件）
         performance_data = redis_client.lrange("performance_history", 0, 49)
@@ -211,7 +211,7 @@ def get_api_usage_stats():
     """API使用統計を取得"""
     try:
         from app.config import settings
-        redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True)
+        redis_client = redis.from_url(settings.get_redis_url(), decode_responses=True)
         
         # API使用回数統計
         api_stats = {}
