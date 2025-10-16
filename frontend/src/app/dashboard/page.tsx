@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { apiRequestJson } from '@/lib/api'
 
 interface TweetResponse {
   tweet_draft: string
@@ -38,23 +39,14 @@ export default function DashboardPage() {
     setPostResult(null)
 
     try {
-      const response = await fetch('/api/generate_tweet', {
+      const data = await apiRequestJson<TweetResponse>('/api/generate_tweet', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ 
           repository: repository.trim(),
           language: language 
         }),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || `ツイート生成に失敗しました: ${response.status}`)
-      }
-
-      const data = await response.json()
+      
       setGeneratedTweet(data)
       setEditableTweetText(data.tweet_draft)
     } catch (error) {
@@ -73,22 +65,13 @@ export default function DashboardPage() {
     setPostResult(null)
 
     try {
-      const response = await fetch('/api/post_tweet', {
+      const data = await apiRequestJson<PostResponse>('/api/post_tweet', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ 
           tweet_text: editableTweetText 
         }),
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || `ツイート投稿に失敗しました: ${response.status}`)
-      }
-
-      const data = await response.json()
+      
       setPostResult(data)
     } catch (error) {
       console.error('ツイート投稿エラー:', error)

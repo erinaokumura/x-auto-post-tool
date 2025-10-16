@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { apiRequestJson } from '@/lib/api'
 
 export default function CallbackPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -31,22 +32,11 @@ export default function CallbackPage() {
       hasProcessed.current = true
 
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
-        const response = await fetch(`${backendUrl}/api/auth/twitter/callback`, {
+        const data = await apiRequestJson('/api/auth/twitter/callback', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({ code, state }),
-          credentials: 'include', // クッキーを含める
         })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.detail || `認証に失敗しました: ${response.status}`)
-        }
-
-        const data = await response.json()
+        
         setStatus('success')
         setMessage('認証が完了しました！ダッシュボードにリダイレクトします...')
 

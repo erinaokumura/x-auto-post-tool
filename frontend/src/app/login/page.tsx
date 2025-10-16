@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { apiRequestJson } from '@/lib/api'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -14,25 +15,9 @@ export default function LoginPage() {
     setErrorMessage('')
 
     try {
-      // 環境変数からバックエンドURLを取得
-      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
-      console.log('🔧 Frontend - Backend URL:', backendUrl);
-      
-      // FastAPIのTwitter認証エンドポイントを直接呼び出し
-      const response = await fetch(`${backendUrl}/api/auth/twitter/login`, {
+      const data = await apiRequestJson<{ authorization_url?: string }>('/api/auth/twitter/login', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // CORS設定
-        mode: 'cors',
       })
-
-      if (!response.ok) {
-        throw new Error(`認証リクエストに失敗しました: ${response.status}`)
-      }
-
-      const data = await response.json()
       
       if (data.authorization_url) {
         setAuthStatus('success')
