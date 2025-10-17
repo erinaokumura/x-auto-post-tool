@@ -232,12 +232,18 @@ def twitter_callback(
         
         # セッションを作成
         session_id = session_service.create_session(str(user.id))
+        # Railway環境かどうかを判定（development/productionどちらも）
+        is_railway_env = settings.ENVIRONMENT in ("production", "development")
+        is_https = is_railway_env  # Railway環境では常にHTTPS
+        
         response.set_cookie(
             key="session_id",
             value=session_id,
+            domain=".up.railway.app" if is_railway_env else None,  # Railway環境ではサブドメイン対応
+            path="/",  # 全パスで有効
             httponly=True,
-            secure=settings.ENVIRONMENT == "production",  # 本番環境ではTrue
-            samesite="none" if settings.ENVIRONMENT in ("production", "development") else "lax",  # クロスオリジン対応
+            secure=is_https,  # Railway環境ではHTTPS必須
+            samesite="none" if is_railway_env else "lax",  # Railway環境ではクロスオリジン対応
             max_age=1800
         )
 
@@ -269,18 +275,29 @@ def get_current_user(
     session_service=Depends(get_session_service),
     db: Session = Depends(get_db)
 ) -> User:
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"認証チェック: session_id={session_id}")
+    
     if not session_id:
+        logger.warning("セッションIDが見つかりません")
         raise HTTPException(status_code=401, detail="未認証")
     
     user_id = session_service.get_user_id(session_id)
+    logger.info(f"セッションから取得したuser_id: {user_id}")
+    
     if not user_id:
+        logger.warning(f"無効なセッション: {session_id}")
         raise HTTPException(status_code=401, detail="セッション無効")
     
     # データベースからユーザー情報を取得
     user = db.query(User).filter(User.id == int(user_id)).first()
     if not user:
+        logger.warning(f"ユーザーが見つかりません: user_id={user_id}")
         raise HTTPException(status_code=401, detail="ユーザーが見つかりません")
     
+    logger.info(f"認証成功: user_id={user.id}, username={user.username}")
     return user
 
 @router.get("/me")
