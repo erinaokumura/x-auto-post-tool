@@ -23,6 +23,7 @@ PowerShellで以下のコマンドを実行：
 # 開発環境の環境変数を設定
 $env:NODE_ENV="development"
 $env:BACKEND_URL="https://x-auto-post-tool-development.up.railway.app"
+$env:NEXT_PUBLIC_API_URL=""
 
 # 開発サーバーを起動
 npm run dev
