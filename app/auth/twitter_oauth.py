@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 CLIENT_ID = settings.TWITTER_CLIENT_ID
 CLIENT_SECRET = settings.TWITTER_CLIENT_SECRET
-REDIRECT_URI = settings.TWITTER_REDIRECT_URI
+REDIRECT_URI = settings.get_twitter_redirect_uri()
 SCOPES = ["tweet.write", "tweet.read", "users.read", "offline.access"]
 
 def get_oauth2_handler():

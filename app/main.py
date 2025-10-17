@@ -66,12 +66,11 @@ async def twitter_callback_redirect(request: Request):
     # 環境に応じてフロントエンドURLを決定
     is_railway_env = settings.ENVIRONMENT in ("production", "development")
     
-    if is_railway_env:
-        # Railway環境（development/production共通）
-        frontend_base_url = "http://localhost:3000"
-        # frontend_base_url = "https://x-auto-post-tool-development.up.railway.app"
+    if settings.ENVIRONMENT == "production":
+        frontend_base_url = "https://x-auto-post-tool.vercel.app"
+    elif settings.ENVIRONMENT == "development":
+        frontend_base_url = "https://x-auto-post-tool.vercel.app"
     else:
-        # ローカル開発環境
         frontend_base_url = "http://localhost:3000"
     
     # フロントエンドのコールバックページにリダイレクト

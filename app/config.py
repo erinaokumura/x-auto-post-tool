@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     TWITTER_CLIENT_SECRET: str = ""
     TWITTER_ACCESS_TOKEN: str = ""
     TWITTER_ACCESS_TOKEN_SECRET: str = ""
-    TWITTER_REDIRECT_URI: str = "http://127.0.0.1:8000/callback"  # 本番では Railway ドメインに変更
+    TWITTER_REDIRECT_URI: str = ""  # 環境変数で設定
     REDIS_URL: str = ""  # Railway Redis URL (本番環境で使用)
     DATABASE_URL: str = ""
     ENCRYPTION_KEY: str = ""
@@ -140,5 +140,20 @@ class Settings(BaseSettings):
             else:
                 expanded_origins.append(origin)
         return expanded_origins
+    
+    def get_twitter_redirect_uri(self) -> str:
+        """
+        環境に応じてTwitter OAuth リダイレクトURIを取得
+        """
+        if self.TWITTER_REDIRECT_URI:
+            return self.TWITTER_REDIRECT_URI
+        
+        # 環境変数が設定されていない場合は環境に応じて自動決定
+        if self.ENVIRONMENT == "production":
+            return "https://x-auto-post-tool-development.up.railway.app/callback"
+        elif self.ENVIRONMENT == "development":
+            return "https://x-auto-post-tool-development.up.railway.app/callback"
+        else:
+            return "http://127.0.0.1:8000/callback"
 
 settings = Settings() 
