@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { apiRequestJson } from '@/lib/api'
 
-export default function CallbackPage() {
+function CallbackContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const searchParams = useSearchParams()
@@ -126,5 +126,27 @@ export default function CallbackPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              認証処理中
+            </h1>
+            <div className="mb-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">認証情報を処理しています...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    }>
+      <CallbackContent />
+    </Suspense>
   )
 } 
