@@ -2,8 +2,9 @@
 
 /**
  * バックエンドAPIのベースURL
+ * 本番環境ではNEXT_PUBLIC_API_URLを使用し、開発環境ではBACKEND_URLまたはlocalhostを使用
  */
-export const API_BASE_URL = process.env.BACKEND_URL || 'http://localhost:8000'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:8000'
 
 /**
  * APIリクエストのデフォルト設定

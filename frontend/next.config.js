@@ -4,6 +4,33 @@ const nextConfig = {
   // 環境変数をクライアントサイドで利用可能にする
   env: {
     BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+  // 本番環境での最適化設定
+  experimental: {
+    optimizeCss: true,
+  },
+  // セキュリティヘッダーの設定
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
   },
 }
 
