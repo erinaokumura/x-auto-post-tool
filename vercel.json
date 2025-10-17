@@ -4,15 +4,10 @@
   "outputDirectory": "frontend/.next",
   "installCommand": "cd frontend && npm install",
   "framework": "nextjs",
-  "functions": {
-    "frontend/src/app/**": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://x-auto-post-tool-development.up.railway.app/"
+      "destination": "https://x-auto-post-tool-development.up.railway.app/api/$1"
     }
   ],
   "headers": [
