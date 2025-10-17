@@ -237,10 +237,10 @@ def twitter_callback(
             value=session_id,
             httponly=True,
             secure=settings.ENVIRONMENT == "production",  # 本番環境ではTrue
-            samesite="lax",
+            samesite="none" if settings.ENVIRONMENT in ("production", "development") else "lax",  # クロスオリジン対応
             max_age=1800
         )
-        
+
         # Redis から認証状態を削除
         oauth_redis.delete(f"{OAUTH_STATE_PREFIX}{req.state}")
         

@@ -60,7 +60,15 @@ async def twitter_callback_redirect(request: Request):
     # クエリパラメータを取得
     query_params = str(request.query_params)
     
+    # 環境に応じてフロントエンドURLを決定
+    if settings.ENVIRONMENT == "production":
+        frontend_base_url = "FIX_ME"
+    if settings.ENVIRONMENT == "development":
+        frontend_base_url = "http://localhost:3000"
+    else:
+        frontend_base_url = "http://localhost:3000"
+    
     # フロントエンドのコールバックページにリダイレクト
-    frontend_callback_url = f"http://localhost:3000/callback?{query_params}"
+    frontend_callback_url = f"{frontend_base_url}/callback?{query_params}"
     
     return RedirectResponse(url=frontend_callback_url)

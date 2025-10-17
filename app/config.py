@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     ENCRYPTION_KEY: str = ""
     
     # CORS設定
-    CORS_ORIGINS: str = "http://localhost:3000,https://*.vercel.app"
+    CORS_ORIGINS: str = "http://localhost:3000,https://*.vercel.app,https://x-auto-post-tool-development.up.railway.app"
     ENVIRONMENT: str = "development"  # development, production
     
     # 最適化設定
