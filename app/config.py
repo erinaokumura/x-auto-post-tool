@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     ENCRYPTION_KEY: str = ""
     
     # CORS設定
-    CORS_ORIGINS: str = "http://localhost:3000,https://*.vercel.app,https://x-auto-post-tool-development.up.railway.app"
+    CORS_ORIGINS: str = "http://localhost:3000,https://*.vercel.app,https://x-auto-post-tool.vercel.app,https://x-auto-post-tool-development.up.railway.app"
     ENVIRONMENT: str = "development"  # development, production
     
     # 最適化設定
@@ -127,6 +127,18 @@ class Settings(BaseSettings):
         CORS設定を環境に応じて取得
         """
         origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
-        return origins
+        # ワイルドカードパターンを展開
+        expanded_origins = []
+        for origin in origins:
+            if "*.vercel.app" in origin:
+                # 具体的なVercelドメインを追加
+                expanded_origins.extend([
+                    "https://x-auto-post-tool.vercel.app",
+                    "https://x-auto-post-tool-git-master.vercel.app",
+                    "https://x-auto-post-tool-git-main.vercel.app"
+                ])
+            else:
+                expanded_origins.append(origin)
+        return expanded_origins
 
 settings = Settings() 

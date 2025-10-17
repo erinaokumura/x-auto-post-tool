@@ -25,9 +25,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # CORS設定（本番環境対応）
 cors_origins = settings.get_cors_origins()
 
+# デバッグ用：CORS設定を出力
+print(f"CORS Origins: {cors_origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=cors_origins if cors_origins else ["*"],  # 緊急対応：設定が空の場合は全許可
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
